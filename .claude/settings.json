@@ -1,0 +1,28 @@
+{
+    "permissions": {
+        "allow": [
+            "Bash(ls -R)",
+            "Bash(git status)",
+            "Bash(npm run build)",
+            "Bash(npm run dev)",
+            "Bash(npm run lint)",
+            "Bash(npm run test)",
+            "Bash(npm run type-check)",
+            "Bash(echo *)",
+            "Bash(cat *)",
+            "Bash(cd *)",
+            "Bash(mkdir -p *)",
+            "Bash(wc *)"
+        ],
+        "deny": [
+            "Bash(rm -rf /)",
+            "Bash(shutdown *)",
+            "Bash(reboot)",
+            "Bash(git push --force)",
+            "Bash(sudo *)"
+        ]
+    },
+    "env": {
+        "NODE_ENV": "development"
+    }
+}
