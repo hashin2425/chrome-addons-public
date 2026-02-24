@@ -9,6 +9,11 @@ const STORAGE_KEY = "urlPatterns";
 // URLパターンをチェックして通知を表示
 async function checkAndDisplayNotification() {
   const currentUrl = window.location.href;
+  const awsPattern = buildAwsRegionPattern(currentUrl);
+  if (awsPattern) {
+    displayNotification(awsPattern);
+    return;
+  }
   const patterns = await getPatterns();
 
   // マッチするパターンを見つける（優先順位順）
@@ -65,4 +70,46 @@ async function getPatterns() {
       resolve(patterns);
     });
   });
+}
+
+function buildAwsRegionPattern(urlString) {
+  const region = extractAwsRegion(urlString);
+
+  if (!region || region === "ap-northeast-1") {
+    return null;
+  }
+
+  return {
+    message: `AWS ${region} リージョンを開いています`,
+    borderColor: "#e53935",
+  };
+}
+
+function extractAwsRegion(urlString) {
+  try {
+    const url = new URL(urlString);
+
+    if (!url.hostname.includes("console.aws.amazon.com")) {
+      return null;
+    }
+
+    const hostMatch = url.hostname.match(/^([a-z0-9-]+)\.console\.aws\.amazon\.com$/);
+    if (hostMatch) {
+      return hostMatch[1];
+    }
+
+    const queryRegion = url.searchParams.get("region");
+    if (queryRegion) {
+      return queryRegion;
+    }
+
+    const pathMatch = url.pathname.match(/\/([a-z0-9-]+-[a-z0-9-]+-\d)(?:\/|$)/);
+    if (pathMatch) {
+      return pathMatch[1];
+    }
+  } catch (error) {
+    console.error("AWS region detection failed:", error);
+  }
+
+  return null;
 }
